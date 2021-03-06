@@ -4,6 +4,7 @@
 extern crate rocket;
 extern crate chrono;
 
+pub mod response;
 pub mod validators;
 
 use std::path::{Path, PathBuf};
@@ -26,6 +27,7 @@ struct User {
     dob: String,
     #[validate(length(min = 3), custom = "validate_country")]
     country: String,
+    state: String,
 }
 
 #[get("/")]
