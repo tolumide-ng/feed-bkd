@@ -1,9 +1,8 @@
-use diesel;
 use monoli;
 
-use self::diesel::prelude::*;
-use self::models::posts::Post;
-use self::monoli::*;
+use crate::diesel::prelude::*;
+use crate::models::posts::Post;
+use monoli::establish_connection;
 
 pub fn get_posts(limit: i64) -> Vec<Post> {
     use monoli::schema::posts::dsl::*;
