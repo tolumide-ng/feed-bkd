@@ -5,6 +5,7 @@ pub mod controllers;
 pub mod models;
 pub mod response;
 pub mod routes;
+pub mod schema;
 pub mod validators;
 
 #[macro_use]
