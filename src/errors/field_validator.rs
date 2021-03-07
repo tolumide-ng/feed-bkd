@@ -1,11 +1,53 @@
+use rocket::http::Status;
+use rocket::request::Request;
+use rocket::response::{self, status, Responder};
+use rocket_contrib::json::Json;
 use validator::{Validate, ValidationError, ValidationErrors};
-
-pub struct FieldValidator {
-    errors: ValidationErrors,
-}
 
 #[derive(Debug)]
 pub struct Errors {
+    errors: ValidationErrors,
+}
+
+pub type FieldName = &'static str;
+pub type FieldErrorCode = &'static str;
+
+impl Errors {
+    pub fn new(errs: &[(FieldName, FieldErrorCode)]) -> Self {
+        let mut errors = ValidationErrors::new();
+
+        for (field, code) in errs {
+            errors.add(field, ValidationError::new(code))
+        }
+
+        Self { errors }
+    }
+}
+
+impl<'r> Responder<'r> for Errors {
+    fn respond_to(self, req: &Request) -> response::Result<'r> {
+        use validator::ValidationErrorsKind::Field;
+
+        let mut errors = json!({});
+
+        for (field, field_errors) in self.errors.into_errors() {
+            if let Field(field_errors) = field_errors {
+                errors[field] = field_errors
+                    .into_iter()
+                    .map(|field_error| field_error.code)
+                    .collect()
+            }
+        }
+
+        status::Custom(
+            Status::UnprocessableEntity,
+            Json(json!({ "erros": errors })),
+        )
+        .respond_to(req)
+    }
+}
+
+pub struct FieldValidator {
     errors: ValidationErrors,
 }
 
@@ -40,7 +82,7 @@ impl FieldValidator {
     {
         field.unwrap_or_else(|| {
             self.errors
-                .add(field_name, ValidationError::new("can't be empty"));
+                .add(field_name, ValidationError::new("cannot be empty"));
             T::default()
         })
     }

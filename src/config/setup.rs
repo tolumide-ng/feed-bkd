@@ -2,6 +2,8 @@ use rocket::config::{Config, Environment, Value};
 use std::collections::HashMap;
 use std::env;
 
+pub const DATE_FORMAT: &'static str = "%Y-%m-%dT%H:%M:%S%.3fZ";
+
 /// Creates rocket config from env variables
 pub fn setup_with_env() -> Config {
     let environment = Environment::active().expect("No environment found");

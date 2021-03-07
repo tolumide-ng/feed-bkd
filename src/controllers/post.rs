@@ -1,26 +1,9 @@
 use crate::db;
 use crate::diesel::prelude::*;
+use crate::errors::field_validator::{Errors, FieldErrorCode, FieldValidator};
 use crate::models::posts::{NewPost, Post};
 use crate::schema;
-use rocket_contrib::json::{Json, JsonValue};
-use serde::Deserialize;
-use validator::Validate;
-
-#[derive(Validate, Debug, Deserialize)]
-pub struct NewPostData {
-    #[validate(length(min = 1))]
-    title: Option<String>,
-    // description: Option<String>,
-    #[validate(length(min = 1))]
-    body: Option<String>,
-    #[validate(length(min = 1))]
-    description: Option<String>,
-}
-
-#[derive(Deserialize)]
-pub struct NewCreatePost {
-    post: NewPostData,
-}
+use diesel::pg::PgConnection;
 
 // pub fn get_posts(limit: i64) -> Vec<Post> {
 //     use schema::posts::dsl::{posts, published};
@@ -35,16 +18,32 @@ pub struct NewCreatePost {
 // }
 
 // add a data guard to this later, should be only for authenticated users
-pub fn create_post<'a>(new_post: Json<NewCreatePost>, conn: &PgConnection) -> Post {
+pub fn create_post<'a>(new_post: Json<NewCreatePost>) -> Result<JsonValue, Errors> {
     use schema::posts;
-    let new_post = NewPost {
-        title: title,
-        body: body,
+
+    let new_post = new_post.into_inner().post;
+
+    let mut extractor = FieldValidator::validate(&new_post);
+    let title = extractor.extract("title", new_post.title).as_str();
+    let description = extractor
+        .extract("description", new_post.description)
+        .as_str();
+    let body = extractor.extract("body", new_post.body).as_str();
+
+    let new_post = &NewPost {
+        title,
+        body,
         description,
     };
 
+    extractor.check()?;
+
     diesel::insert_into(posts::table)
-        .values(&new_post)
-        .get_result(conn)
-        .expect("Error saving new post")
+        .values(new_post)
+        .get_result::<Post>(conn)
+        .expect("Error creating post");
+
+    let post = {};
+
+    Ok(json!({ "post": post }))
 }

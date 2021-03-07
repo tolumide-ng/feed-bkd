@@ -36,6 +36,6 @@ pub fn rocket() -> rocket::Rocket {
     dotenv().ok();
 
     rocket::custom(config::setup::setup_with_env())
-        .mount("/api", routes![post::get_posts, post::create_post])
+        .mount("/api", routes![post::create_post])
         .attach(db::connect::Conn::fairing())
 }

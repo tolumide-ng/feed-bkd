@@ -4,5 +4,9 @@ table! {
         title -> Varchar,
         body -> Text,
         published -> Bool,
+        slug -> VarChar,
+        description -> VarChar,
+        created_at -> Timestamptz,
+        updated_at -> Timestamptz,
     }
 }
