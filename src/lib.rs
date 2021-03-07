@@ -1,5 +1,10 @@
+#![feature(proc_macro_hygiene, decl_macro)]
+
 #[macro_use]
 extern crate rocket;
+
+#[macro_use]
+extern crate rocket_contrib;
 
 #[macro_use]
 extern crate chrono;
@@ -10,21 +15,26 @@ extern crate diesel;
 #[macro_use]
 extern crate dotenv;
 
-#[macro_use]
-extern crate rocket_contrib;
-
-pub mod models;
-pub mod schema;
+mod config;
+mod controllers;
+mod db;
+mod models;
+mod response;
+mod routes;
+mod schema;
+mod validators;
 
 use diesel::pg::PgConnection;
 use diesel::prelude::*;
 use dotenv::dotenv;
+use routes::auth;
+use routes::post;
 use std::env;
 
-pub fn establish_connection() -> PgConnection {
+pub fn rocket() -> rocket::Rocket {
     dotenv().ok();
 
-    let database_url = env::var("DATABASE_URL").expect("DATABASE_URL must be set");
-
-    PgConnection::establish(&database_url).expect(&format!("Error connecting to {}", database_url))
+    rocket::custom(config::setup::setup_with_env())
+        .mount("/api", routes![post::get_posts, post::create_post])
+        .attach(db::connect::Conn::fairing())
 }

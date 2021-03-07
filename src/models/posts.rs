@@ -8,6 +8,8 @@ pub struct Post {
     pub title: String,
     pub body: String,
     pub published: bool,
+    pub slug: String,
+    pub description: String,
 }
 
 #[derive(Insertable)]
