@@ -18,6 +18,7 @@ extern crate dotenv;
 mod config;
 mod controllers;
 mod db;
+mod errors;
 mod models;
 mod response;
 mod routes;
