@@ -13,3 +13,4 @@ validator = { version = "0.12", features = ["derive"] }
 serde = { version = "1.0.123", features = ["derive"] }
 diesel = { version = "1.4.4", features = ["postgres"] }
 dotenv = "0.15.0"
+rocket_contrib = "0.4.7"

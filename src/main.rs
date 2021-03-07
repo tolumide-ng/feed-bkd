@@ -9,9 +9,18 @@ pub mod validators;
 
 #[macro_use]
 extern crate rocket;
+
+#[macro_use]
 extern crate chrono;
+
+#[macro_use]
 extern crate diesel;
+
+#[macro_use]
 extern crate dotenv;
+
+#[macro_use]
+extern crate rocket_contrib;
 
 use routes::auth;
 use routes::post;

@@ -4,12 +4,6 @@ use monoli;
 use self::diesel::prelude::*;
 use self::models::posts::Post;
 use self::monoli::*;
-// use crate::models::posts::Post;
-
-// pub struct Post {
-//     title: String,
-//     body: String,
-// }
 
 pub fn get_posts(limit: i64) -> Vec<Post> {
     use monoli::schema::posts::dsl::*;
